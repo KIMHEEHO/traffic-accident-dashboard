@@ -1,5 +1,12 @@
 <template>
-  <base-chart :title="title" :series="series" :legend="legend" :x-axis="xAxis" :y-axis="yAxis" />
+  <base-chart
+    v-if="isChartData"
+    :title="title"
+    :series="series"
+    :legend="legend"
+    :x-axis="xAxis"
+    :y-axis="yAxis"
+  />
 </template>
 <script setup lang="ts">
 import { useTrafficAccidentStore } from 'src/stores/useTrafficAccidentStore';
@@ -12,6 +19,10 @@ const { trafficAccidentData } = storeToRefs(trafficAccidentStore);
 
 const trafficAccidentDataList = computed(() => {
   return trafficAccidentData.value;
+});
+
+const isChartData = computed(() => {
+  return trafficAccidentDataList.value.length > 0;
 });
 
 const title = '연도별 사고 추이';
