@@ -32,21 +32,30 @@ const series = computed(() => {
       name: '사고 건수',
       type: 'bar' as const,
       data: trafficAccidentDataList.value.map((item) => item.acc_cnt),
+      bargap: '30%',
     },
     {
       name: '사망자 수',
       type: 'bar' as const,
       data: trafficAccidentDataList.value.map((item) => item.dth_dnv_cnt),
+      bargap: '30%',
     },
     {
       name: '부상자 수',
       type: 'bar' as const,
       data: trafficAccidentDataList.value.map((item) => item.injpsn_cnt),
+      bargap: '30%',
+    },
+    {
+      name: '치사율',
+      type: 'bar' as const,
+      data: trafficAccidentDataList.value.map((item) => item.ftlt_rate),
+      bargap: '30%',
     },
   ];
 });
 const legend = {
-  data: ['사고 건수', '사망자 수', '부상자 수'],
+  data: ['사고 건수', '사망자 수', '부상자 수', '치사율'],
 };
 
 const xAxis = computed(() => {

@@ -1,39 +1,55 @@
 <template>
   <div class="q-pa-md">
-    <q-select
-      v-model="selectedYear"
-      :options="yearList"
-      option-label="label"
-      option-value="value"
-      emit-value
-      map-options
-      label="연도 선택"
-    />
-    <q-select
-      v-model="selectedSiDo"
-      :options="siDoList"
-      option-label="name"
-      option-value="code"
-      emit-value
-      map-options
-      label="시/도 선택"
-    />
+    <div class="row q-col-gutter-md items-end">
+      <div class="col">
+        <q-select
+          v-model="selectedYear"
+          :options="yearList"
+          option-label="label"
+          option-value="value"
+          emit-value
+          map-options
+          label="연도 선택"
+          outlined
+          dense
+        />
+      </div>
 
-    <q-select
-      v-model="selectedGuGun"
-      :options="guGunMap[selectedSiDo] || []"
-      option-label="name"
-      option-value="code"
-      emit-value
-      map-options
-      label="구/군 선택"
-      :disable="!selectedSiDo"
-    />
+      <div class="col">
+        <q-select
+          v-model="selectedSiDo"
+          :options="siDoList"
+          option-label="name"
+          option-value="code"
+          emit-value
+          map-options
+          label="시/도 선택"
+          outlined
+          dense
+        />
+      </div>
 
-    <q-btn label="조회" color="primary" class="q-mt-md" @click="searchAccidents" />
+      <div class="col">
+        <q-select
+          v-model="selectedGuGun"
+          :options="guGunMap[selectedSiDo] || []"
+          option-label="name"
+          option-value="code"
+          emit-value
+          map-options
+          label="구/군 선택"
+          :disable="!selectedSiDo"
+          outlined
+          dense
+        />
+      </div>
+
+      <div class="col-auto">
+        <q-btn label="조회" color="primary" @click="searchAccidents" />
+      </div>
+    </div>
   </div>
 </template>
-
 <script setup lang="ts">
 import { siDoList, guGunMap, type SiDoCode } from 'src/constants/locations';
 import { ref, watch } from 'vue';

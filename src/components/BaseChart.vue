@@ -4,7 +4,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import * as echarts from 'echarts/core';
-import { BarChart, LineChart } from 'echarts/charts';
+import { BarChart, LineChart, PieChart } from 'echarts/charts';
 import {
   TitleComponent,
   TooltipComponent,
@@ -15,7 +15,7 @@ import {
 } from 'echarts/components';
 import { LabelLayout, UniversalTransition } from 'echarts/features';
 import { CanvasRenderer } from 'echarts/renderers';
-import type { BarSeriesOption, LineSeriesOption } from 'echarts/charts';
+import type { BarSeriesOption, LineSeriesOption, PieSeriesOption } from 'echarts/charts';
 import type {
   TitleComponentOption,
   TooltipComponentOption,
@@ -28,6 +28,7 @@ import type { ComposeOption } from 'echarts/core';
 type ECOption = ComposeOption<
   | BarSeriesOption
   | LineSeriesOption
+  | PieSeriesOption
   | TitleComponentOption
   | TooltipComponentOption
   | GridComponentOption
@@ -43,6 +44,7 @@ echarts.use([
   TransformComponent,
   BarChart,
   LineChart,
+  PieChart,
   LabelLayout,
   UniversalTransition,
   CanvasRenderer,
@@ -65,7 +67,7 @@ interface ChartProps {
 const props = withDefaults(defineProps<ChartProps>(), {
   style: () => ({
     width: '100%',
-    height: '400px',
+    height: '250px',
   }),
   title: '',
   legend: () => ({
@@ -83,7 +85,7 @@ const props = withDefaults(defineProps<ChartProps>(), {
     type: 'value',
   }),
 
-  series: (): (LineSeriesOption | BarSeriesOption)[] => [
+  series: (): (LineSeriesOption | BarSeriesOption | PieSeriesOption)[] => [
     {
       name: 'Series 1',
       type: 'bar' as const,
