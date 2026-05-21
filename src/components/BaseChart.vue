@@ -57,8 +57,8 @@ interface ChartProps {
   title?: string;
   legend?: ECOption['legend'];
   tooltip?: ECOption['tooltip'];
-  xAxis?: ECOption['xAxis'];
-  yAxis?: ECOption['yAxis'];
+  xAxis?: object;
+  yAxis?: object;
   series?: ECOption['series'];
 }
 
@@ -72,17 +72,21 @@ const props = withDefaults(defineProps<ChartProps>(), {
     data: ['Series 1'],
   }),
   tooltip: () => ({}),
+
   xAxis: () => ({
     type: 'category',
+    boundaryGap: false,
     data: [],
   }),
+
   yAxis: () => ({
     type: 'value',
   }),
-  series: () => [
+
+  series: (): (LineSeriesOption | BarSeriesOption)[] => [
     {
       name: 'Series 1',
-      type: 'line',
+      type: 'bar' as const,
       data: [],
     },
   ],
