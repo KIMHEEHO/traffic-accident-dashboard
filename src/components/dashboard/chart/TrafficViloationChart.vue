@@ -25,52 +25,56 @@ const isChartData = computed(() => {
   return trafficAccidentDataList.value.length > 0;
 });
 
+const chartData = computed(() => {
+  return trafficAccidentDataList.value.filter((item) => item.acc_cl_nm === '전체사고');
+});
+
 const title = '법규 위반 분포';
 const series = computed(() => {
   return [
     {
       name: '과속',
       type: 'bar' as const,
-      data: trafficAccidentDataList.value.map((item) => item.cnt_027_01),
+      data: chartData.value.map((item) => item.cnt_027_01),
+      barGap: '30%',
     },
     {
       name: '중앙선침범',
       type: 'bar' as const,
-      data: trafficAccidentDataList.value.map((item) => item.cnt_027_02),
+      data: chartData.value.map((item) => item.cnt_027_02),
+      barGap: '30%',
     },
     {
       name: '신호위반',
       type: 'bar' as const,
-      data: trafficAccidentDataList.value.map((item) => item.cnt_027_03),
+      data: chartData.value.map((item) => item.cnt_027_03),
+      barGap: '30%',
     },
     {
       name: '안전거리미확보',
       type: 'bar' as const,
-      data: trafficAccidentDataList.value.map((item) => item.cnt_027_04),
+      data: chartData.value.map((item) => item.cnt_027_04),
+      barGap: '30%',
     },
     {
       name: '안전운전의무불이행',
       type: 'bar' as const,
-      data: trafficAccidentDataList.value.map((item) => item.cnt_027_05),
+      data: chartData.value.map((item) => item.cnt_027_05),
+      barGap: '30%',
     },
   ];
 });
 const legend = {
+  type: 'scroll',
   data: ['과속', '중앙선침범', '신호위반', '안전거리미확보', '안전운전의무불이행'],
 };
 
 const xAxis = computed(() => {
-  const isChartData = trafficAccidentDataList.value.length > 0;
-  const chartData = isChartData
-    ? trafficAccidentDataList.value.filter((item) => item.acc_cl_nm === '전체사고')
-    : [];
-  return [
-    {
-      type: 'category',
-      data: chartData.map((item) => item.std_year),
-      boundaryGap: false,
-    },
-  ];
+  return {
+    type: 'category' as const,
+    data: chartData.value.map((item) => item.std_year),
+    boundaryGap: true,
+  };
 });
 
 const yAxis = {

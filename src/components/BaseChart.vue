@@ -1,8 +1,9 @@
 <template>
   <div ref="chart" :style="props.style"></div>
 </template>
+
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue';
 import * as echarts from 'echarts/core';
 import { BarChart, LineChart, PieChart } from 'echarts/charts';
 import {
@@ -24,6 +25,7 @@ import type {
   LegendComponentOption,
 } from 'echarts/components';
 import type { ComposeOption } from 'echarts/core';
+import { Dark } from 'quasar';
 
 type ECOption = ComposeOption<
   | BarSeriesOption
@@ -60,7 +62,7 @@ interface ChartProps {
   legend?: ECOption['legend'];
   tooltip?: ECOption['tooltip'];
   xAxis?: object;
-  yAxis?: object;
+  yAxis?: object | object[]; // 축이 여러 개일 수 있으므로 배열 허용
   series?: ECOption['series'];
 }
 
@@ -95,31 +97,84 @@ const props = withDefaults(defineProps<ChartProps>(), {
 });
 
 const chart = ref<HTMLElement | null>(null);
-const chartInstance = ref<echarts.ECharts | null>(null);
+
+const chartInstance = shallowRef<echarts.ECharts | null>(null);
+
+const normalizedSeries = computed(() =>
+  (Array.isArray(props.series) ? props.series : [props.series]).map((s) => ({
+    ...s,
+    ...(s.type === 'bar' ? { barWidth: 18 } : {}),
+  })),
+);
+
 const option = computed<ECOption>(() => ({
+  backgroundColor: Dark.isActive ? '#121212' : '#fff',
+
   title: {
     text: props.title,
+    textStyle: {
+      color: Dark.isActive ? '#fff' : '#333',
+    },
   },
-  legend: props.legend,
-  tooltip: props.tooltip,
-  xAxis: props.xAxis,
-  yAxis: props.yAxis,
-  series: props.series,
+  legend: {
+    ...props.legend,
+    textStyle: {
+      color: Dark.isActive ? '#fff' : '#333',
+    },
+  },
+  tooltip: {
+    ...props.tooltip,
+    backgroundColor: Dark.isActive ? '#333' : '#fff',
+    textStyle: {
+      color: Dark.isActive ? '#fff' : '#333',
+    },
+  },
+
+  xAxis: {
+    ...props.xAxis,
+    axisLabel: {
+      color: Dark.isActive ? '#ccc' : '#333',
+    },
+    axisLine: {
+      lineStyle: {
+        color: Dark.isActive ? '#666' : '#ccc',
+      },
+    },
+  },
+  yAxis: Array.isArray(props.yAxis)
+    ? props.yAxis.map((axis) => ({
+        ...axis,
+        axisLabel: { color: Dark.isActive ? '#ccc' : '#333', ...axis.axisLabel },
+        splitLine: { lineStyle: { color: Dark.isActive ? '#333' : '#eee' }, ...axis.splitLine },
+      }))
+    : {
+        ...props.yAxis,
+        axisLabel: { color: Dark.isActive ? '#ccc' : '#333' },
+        splitLine: { lineStyle: { color: Dark.isActive ? '#333' : '#eee' } },
+      },
+
+  series: normalizedSeries.value,
 }));
 
-watch(option, (newOption) => {
-  chartInstance.value?.setOption(newOption);
-});
+watch(
+  option,
+  (newOption) => {
+    if (chartInstance.value && !chartInstance.value.isDisposed()) {
+      chartInstance.value.setOption(newOption, true);
+    }
+  },
+  { deep: true },
+);
 
 const handleResize = () => {
-  chartInstance.value?.resize();
+  if (!chartInstance.value || chartInstance.value.isDisposed()) return;
+  chartInstance.value.resize();
 };
 
 onMounted(() => {
   if (!chart.value) return;
 
   chartInstance.value = echarts.init(chart.value);
-
   chartInstance.value.setOption(option.value);
 
   window.addEventListener('resize', handleResize);
@@ -128,7 +183,9 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize);
 
-  chartInstance.value?.dispose();
-  chartInstance.value = null;
+  if (chartInstance.value) {
+    chartInstance.value.dispose();
+    chartInstance.value = null;
+  }
 });
 </script>
