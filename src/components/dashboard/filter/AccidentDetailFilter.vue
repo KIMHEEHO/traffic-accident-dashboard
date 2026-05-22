@@ -12,8 +12,8 @@
   >
     {{ opt.label }}
   </q-chip>
-  <div v-if="selectedTypes.length >= 3" class="text-caption text-grey">
-    최대 3개까지만 선택 가능
+  <div v-if="selectedTypes.length >= 4" class="text-caption text-grey">
+    최대 4개까지만 선택 가능
   </div>
 </template>
 <script setup lang="ts">
@@ -49,7 +49,7 @@ const toggle = (val: string) => {
   if (idx > -1) {
     selectedTypes.value.splice(idx, 1);
   } else {
-    if (selectedTypes.value.length < 3) {
+    if (selectedTypes.value.length < 4) {
       selectedTypes.value.push(val);
     }
   }
