@@ -1,36 +1,80 @@
-# Quasar App (quasar-project)
+# 📊 전국 교통사고 데이터 분석 대시보드 (Traffic Accident Dashboard)
 
-A Quasar Project
-## Install the dependencies
+> **공공 데이터를 기반으로 전국의 교통사고 추이 및 통계를 직관적으로 시각화하여 보여주는 프론트엔드 대시보드 프로젝트입니다.**  
+> 사용자 중심의 다각도 분석 기능과 유효성 검증 로직을 포함하고 있으며, 컴포넌트 기반 아키텍처로 깔끔하게 설계되었습니다.
+
+---
+
+## ✨ 주요 기능 (Key Features)
+
+### 🧱 4단 분할 반응형 대시보드
+
+- **통합 관제 레이아웃**: 최근 10개년 전국 교통사고 추이와 더불어 연도별 사고 추이, 사고 유형, 법규 위반 분포를 한 화면에서 유기적으로 파악할 수 있는 4단 그리드를 제공합니다.
+- **맞춤형 상세 분석**: 어린이 사고, 고령자 사고, 야간 사고, 뺑소니 사고, 무면허 사고 등 필터링하고자 하는 사고 유형을 **최대 4개까지 자유롭게 선택**하여 심층 분석할 수 있습니다.
+
+### 📈 데이터 시각화 최적화 (Data Visualization)
+
+- 데이터의 특성에 맞춰 **Bar(막대), Line(선형), Pie(원형)** 차트를 적재적소에 활용하여 다차원 데이터 분석의 용이성을 극대화했습니다.
+- 차트 내부의 간격 옵션 및 스타일 디테일을 조율하여 꽉 차고 시원시원한 시각적 가독성을 확보했습니다.
+
+### 🛑 스마트 검색 조건 유효성 검사 (Validation)
+
+- 데이터 조회 시 기준 연도, 지역 등 필수 조건이 누락되지 않도록 철저한 사전 검증 로직을 수행합니다.
+- 필수 조건 미선택 또는 API 요청 결과 데이터가 존재하지 않는 예외 상황 발생 시, **Quasar Framework의 Dialog**를 통해 사용자에게 직관적인 알림을 제공합니다.
+
+---
+
+## 🛠️ 기술 스택 (Tech Stack)
+
+| 분류                 | 기술 기술 / 라이브러리                      |
+| :------------------- | :------------------------------------------ |
+| **Framework**        | Vue 3 (Composition API, `<script setup>`)   |
+| **UI Library**       | Quasar Framework (Vite 기반)                |
+| **Language**         | TypeScript, JavaScript                      |
+| **State Management** | Pinia (비즈니스 로직 및 API 상태 분리 관리) |
+| **Build Tool**       | Vite                                        |
+
+---
+
+## 💡 트러블슈팅 기록 (Troubleshooting)
+
+### 1. ECharts 공통 컴포넌트 분리와 Series 타입 오류 (과도한 추상화의 위험성)
+
+- **현상**: 대시보드 내 다양한 차트(Bar, Line, Pie)의 중복 코드를 줄이기 위해 ECharts를 공통 컴포넌트로 분리하는 과정에서, 차트 타입별로 상이한 `series` 구조와 옵션 때문에 엄격한 TypeScript 타입(Type) 에러가 발생하고 유지보수가 까다로워지는 문제 직면.
+- **원인**: 모든 차트를 하나의 공통 컴포넌트로 완벽하게 처리하려는 '과도한 추상화'가 원인이었습니다. 무리하게 공통화를 진행하다 보니 오히려 유연성이 떨어지고 타입 처리가 비대해졌습니다.
+- **해결**: **"적당히 공통으로 짜고, 세부적인 것은 사용하는 쪽에서 수정한다"**는 타협점을 도출했습니다. 뼈대가 되는 베이스 차트 프레임과 바인딩 로직만 공통 컴포넌트로 최소한으로 추상화하고, 차트 고유의 세부 `options`와 `series` 데이터 구조는 개별 페이지(사용하는 쪽)에서 주입받아 처리하도록 구조를 유연하게 변경하여 타입 안정성과 개발 생산성을 동시에 확보했습니다.
+
+### 2. Vue 3에서 ECharts 사용 시 `ref` 대신 `shallowRef`를 사용해야 하는 이유 (다크모드 이슈)
+
+- **현상**: 대시보드 테마 변경(다크모드 등)이나 데이터 갱신 시, 차트 그래픽이 깨지고 다크모드 스타일이 온전하게 반영되지 않는 렌더링 병목 현상 발생.
+- **원인**: Vue 3의 일반 `ref`는 객체의 내부 프로퍼티까지 모두 추적하는 깊은 반응형(Deep Reactive)을 적용합니다. 하지만 ECharts의 대대적인 전역 인스턴스 객체는 수많은 내부 API와 DOM 참조를 포함하고 있어서, Vue가 이를 하나하나 감시(Proxy 객체로 변환)하려다 보니 인스턴스가 오염되고 성능 저하와 테마 전환 오류를 유발했습니다.
+- **해결**: ECharts 인스턴스를 담는 변수를 `ref` 대신 **`shallowRef`**로 변경했습니다. 객체의 껍데기(참조 주소값)만 반응형으로 추적하고 내부 그래픽 엔진은 오염시키지 않도록 차단하여, 다크모드 전환 시 스타일 갱신이 버벅임 없이 즉각적으로 반영되도록 최적화했습니다.
+
+### 3. Pinia 스토어(Store) 내에서 `useQuasar`와 `Dialog` 플러그인이 작동하지 않는 이유
+
+- **현상**: API 요청 실패 및 검색 유효성 실패 로직을 스토어(`useTrafficAccidentStore.ts`) 내에서 공통 처리하기 위해 `useQuasar()` 훅을 호출했으나, 런타임에 팝업 인스턴스를 찾지 못하고 `Cannot read properties of null (reading 'show')` 에러를 뱉으며 앱이 마비됨.
+- **원인**: Quasar의 `useQuasar()` 훅은 Vue의 전역 Context(부모 컴포넌트 인스턴스) 내부에서만 정상적으로 동작하도록 설계되어 있습니다. 하지만 Pinia 스토어 파일의 최상위 영역(Top-level)은 컴포넌트 생명주기(Lifecycle) 바깥에 존재하므로, 앱 부팅 시점에 퀘이사 인스턴스가 아직 준비되지 않아 `null`을 반환하는 타이밍 이슈였습니다.
+- **해결**: 스토어 내부나 파일 최상단에서 `useQuasar`를 직접 사용하는 대신, 비즈니스 로직(데이터 요청, 유효성 검사 등) 결과인 상태값만 스토어에서 관리하도록 역할을 철저히 분리했습니다. 이후 실제 UI를 담당하는 `.vue` 컴포넌트 단의 이벤트 헨들러 및 `onMounted` 내부에서 안전하게 `useQuasar()`를 호출하고 다이얼로그를 트리거하도록 구조를 바로잡아 오류를 완벽히 해결했습니다.
+
+## 🚀 실행 방법 (Getting Started)
+
+프로젝트를 로컬 컴퓨터에 다운로드하고 개발 서버를 구동하는 방법입니다.
+
+### 1. 저장소 클론 및 패키지 설치
+
 ```bash
-yarn
-# or
+# 저장소 클론
+git clone [https://github.com/KIMHEEHO/traffic-accident-dashboard.git](https://github.com/KIMHEEHO/traffic-accident-dashboard.git)
+
+# 프로젝트 폴더로 이동
+cd traffic-accident-dashboard
+
+# 의존성 패키지 설치
 npm install
 ```
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
-```bash
-quasar dev
-```
+### 2. 개발 서버 구동 (Development Server)
 
-### Lint the files
 ```bash
-yarn lint
-# or
-npm run lint
+npm run dev
 ```
-
-### Format the files
-```bash
-yarn format
-# or
-npm run format
-```
-
-### Build the app for production
-```bash
-quasar build
-```
-
-### Customize the configuration
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
