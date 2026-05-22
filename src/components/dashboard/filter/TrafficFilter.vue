@@ -55,12 +55,14 @@ import { siDoList, guGunMap, type SiDoCode } from 'src/constants/locations';
 import { ref, watch } from 'vue';
 import { useTrafficAccidentStore } from 'src/stores/useTrafficAccidentStore';
 import type TrafficAccidentParam from 'src/types/TrafficAccidentParam';
+import { useQuasar } from 'quasar';
+import NoticeDialog from 'src/components/NoticeDialog.vue';
 
 const trafficAccidentStore = useTrafficAccidentStore();
 const selectedYear = ref('');
 const selectedSiDo = ref<SiDoCode>('1100');
 const selectedGuGun = ref('');
-
+const quasar = useQuasar();
 const yearList = [
   { label: '2014', value: '2014' },
   { label: '2015', value: '2015' },
@@ -83,12 +85,27 @@ watch(selectedSiDo, (newSiDo) => {
 });
 
 const searchAccidents = async () => {
-  console.log('검색 조건:', {
-    searchYearCd: selectedYear.value,
-    siDo: selectedSiDo.value,
-    guGun: selectedGuGun.value,
-    type: 'json',
-  });
+  // 검색 조건 선택하지 않으면 dialog 띄우고 api 요청하지 않음
+  if (selectedYear.value === '') {
+    quasar.dialog({
+      component: NoticeDialog,
+      componentProps: {
+        title: '검색 조건 확인',
+        message: '기준연도를 선택해 주세요!',
+      },
+    });
+    return;
+  } else if (selectedGuGun.value === '') {
+    quasar.dialog({
+      component: NoticeDialog,
+      componentProps: {
+        title: '검색 조건 확인',
+        message: '구/군을 선택해 주세요!',
+      },
+    });
+    return;
+  }
+
   const params: TrafficAccidentParam = {
     searchYearCd: selectedYear.value,
     siDo: selectedSiDo.value,
