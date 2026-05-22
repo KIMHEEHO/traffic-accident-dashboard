@@ -41,21 +41,21 @@ const series = computed(() => {
       name: '사고 건수',
       type: 'bar' as const,
       data: chartData.value.map((item) => item.acc_cnt),
-      barGap: '30%',
+      barGap: '100%',
       itemStyle: { color: '#5470C6' },
     },
     {
       name: '사망자 수',
       type: 'bar' as const,
       data: chartData.value.map((item) => item.dth_dnv_cnt),
-      barGap: '30%',
+      barGap: '100%',
       itemStyle: { color: '#EE6666' },
     },
     {
       name: '부상자 수',
       type: 'bar' as const,
       data: chartData.value.map((item) => item.injpsn_cnt),
-      barGap: '30%',
+      barGap: '100%',
       itemStyle: { color: '#91CC75' },
     },
     {
@@ -63,7 +63,7 @@ const series = computed(() => {
       type: 'bar' as const,
       yAxisIndex: 1,
       data: chartData.value.map((item) => item.ftlt_rate),
-      barGap: '30%',
+      barGap: '100%',
       itemStyle: { color: '#FAC858' },
     },
   ];
