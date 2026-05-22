@@ -26,9 +26,8 @@ const props = defineProps({
   },
 });
 
-defineEmits([...useDialogPluginComponent.emits]);
-
-const { onDialogHide, onDialogOK } = useDialogPluginComponent();
+defineEmits(['ok', 'hide']);
+const { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent();
 
 const onClickOk = () => {
   onDialogOK();

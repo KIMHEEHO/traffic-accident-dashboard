@@ -57,8 +57,11 @@ import { useTrafficAccidentStore } from 'src/stores/useTrafficAccidentStore';
 import type TrafficAccidentParam from 'src/types/TrafficAccidentParam';
 import { useQuasar } from 'quasar';
 import NoticeDialog from 'src/components/NoticeDialog.vue';
+import { useDashboardStore } from 'src/stores/useDashboardStore';
+import { storeToRefs } from 'pinia';
 
 const trafficAccidentStore = useTrafficAccidentStore();
+const dashboardStore = useDashboardStore();
 const selectedYear = ref('');
 const selectedSiDo = ref<SiDoCode>('1100');
 const selectedGuGun = ref('');
@@ -84,24 +87,20 @@ watch(selectedSiDo, (newSiDo) => {
   selectedGuGun.value = list[0]?.code ?? '';
 });
 
+const { searchData } = storeToRefs(dashboardStore);
+
 const searchAccidents = async () => {
-  // 검색 조건 선택하지 않으면 dialog 띄우고 api 요청하지 않음
+  // 검색 조건 유효성 검사
   if (selectedYear.value === '') {
     quasar.dialog({
       component: NoticeDialog,
-      componentProps: {
-        title: '검색 조건 확인',
-        message: '기준연도를 선택해 주세요!',
-      },
+      componentProps: { title: '검색 조건 확인', message: '기준연도를 선택해 주세요!' },
     });
     return;
   } else if (selectedGuGun.value === '') {
     quasar.dialog({
       component: NoticeDialog,
-      componentProps: {
-        title: '검색 조건 확인',
-        message: '구/군을 선택해 주세요!',
-      },
+      componentProps: { title: '검색 조건 확인', message: '구/군을 선택해 주세요!' },
     });
     return;
   }
@@ -112,6 +111,19 @@ const searchAccidents = async () => {
     guGun: selectedGuGun.value,
     type: 'json',
   };
-  await trafficAccidentStore.getTrafficAccidentData(params);
+
+  const result = await trafficAccidentStore.getTrafficAccidentData(params);
+
+  if (result === 'NO_DATA') {
+    quasar.dialog({
+      component: NoticeDialog,
+      componentProps: {
+        title: '데이터 확인',
+        message: '선택하신 조건의 교통사고 데이터가 존재하지 않습니다.',
+      },
+    });
+  } else if (result === 'SUCCESS') {
+    searchData.value = [selectedYear.value, selectedSiDo.value, selectedGuGun.value];
+  }
 };
 </script>

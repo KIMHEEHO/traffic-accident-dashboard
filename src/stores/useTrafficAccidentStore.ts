@@ -20,9 +20,17 @@ export const useTrafficAccidentStore = defineStore('useTrafficAccidentStore', {
 
         const res = await axios.get(url);
 
+        //데이터가 존재하지 않을 경우
+        if (res.data.resultCode === '03') {
+          this.trafficAccidentData = [];
+          return 'NO_DATA';
+        }
+
         this.trafficAccidentData = res.data.items.item;
+        return 'SUCCESS';
       } catch (error) {
         console.error(error);
+        return 'ERROR';
       }
     },
   },
