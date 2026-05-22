@@ -61,6 +61,7 @@ const series = computed(() => {
     {
       name: '치사율',
       type: 'bar' as const,
+      yAxisIndex: 1,
       data: chartData.value.map((item) => item.ftlt_rate),
       barGap: '30%',
       itemStyle: { color: '#FAC858' },
@@ -75,11 +76,24 @@ const xAxis = computed(() => {
   return {
     type: 'category' as const,
     data: chartData.value.map((item) => item.std_year),
-    boundaryGap: true,
+    boundaryGap: false,
   };
 });
 
-const yAxis = {
-  type: 'value',
-};
+const yAxis = [
+  {
+    type: 'value' as const,
+    name: '사고/인원수 (건/명)',
+    position: 'left' as const,
+  },
+  {
+    type: 'value' as const,
+    name: '치사율 (%)',
+    position: 'right' as const,
+    splitLine: { show: false },
+    axisLabel: {
+      formatter: '{value} %',
+    },
+  },
+];
 </script>
