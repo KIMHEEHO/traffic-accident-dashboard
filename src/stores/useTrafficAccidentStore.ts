@@ -17,10 +17,8 @@ export const useTrafficAccidentStore = defineStore('useTrafficAccidentStore', {
       try {
         const res = await axios.get('/api/traffic', {
           params: {
-            searchYearCd: params.searchYearCd,
-            siDo: params.siDo,
-            guGun: params.guGun,
-            type: params.type,
+            ...params,
+            _t: Date.now(),
           },
         });
 
